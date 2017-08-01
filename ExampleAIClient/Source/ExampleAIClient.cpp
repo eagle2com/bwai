@@ -42,18 +42,18 @@ int main(int argc, const char* argv[])
 			}
 		}
 
-		map_thread = new std::thread([&]() {
-			cout << "Analyzing map ... " << endl;
-			//BWTA::readMap();
-			//BWTA::analyze();
-			cout << "Map analyzed!" << endl;
-			analyzis_finished = true;
-		});
+		//map_thread = new std::thread([&]() {
+		cout << "Analyzing map ... ";
+		BWTA::analyze();
+		analyzis_finished = true;
+		//BWTA::cleanMemory();
+		cout << " DONE!" << endl;
+		//});
 
 		
 
 		std::cout << "starting match!" << std::endl;
-		Broodwar->sendText("Hello world!");
+		Broodwar->sendText("power overwhelming");
 		Broodwar << "The map is " << Broodwar->mapName() << ", a " << Broodwar->getStartLocations().size() << " player map" << std::endl;
 		// Enable some cheat flags
 		Broodwar->enableFlag(Flag::UserInput);
@@ -146,7 +146,7 @@ int main(int argc, const char* argv[])
 					}
 					break;
 				case EventType::UnitShow:
-		;
+		
 					break;
 				case EventType::UnitHide:
 
@@ -160,6 +160,8 @@ int main(int argc, const char* argv[])
 					break;
 				}
 			}
+
+			ai->tick();
 
 			if (show_bullets)
 				drawBullets();
@@ -180,6 +182,7 @@ int main(int argc, const char* argv[])
 			}
 		}
 		std::cout << "Game ended" << std::endl;
+		BWTA::cleanMemory();
 	}
 	std::cout << "Press ENTER to continue..." << std::endl;
 	std::cin.ignore();
