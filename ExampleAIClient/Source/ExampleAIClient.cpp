@@ -22,6 +22,9 @@ void reconnect()
 
 AI* ai = nullptr;
 
+std::thread* map_thread = nullptr;
+bool analyzis_finished = false;
+
 int main(int argc, const char* argv[])
 {
 	std::cout << "Connecting..." << std::endl;;
@@ -38,6 +41,17 @@ int main(int argc, const char* argv[])
 				reconnect();
 			}
 		}
+
+		map_thread = new std::thread([&]() {
+			cout << "Analyzing map ... " << endl;
+			//BWTA::readMap();
+			//BWTA::analyze();
+			cout << "Map analyzed!" << endl;
+			analyzis_finished = true;
+		});
+
+		
+
 		std::cout << "starting match!" << std::endl;
 		Broodwar->sendText("Hello world!");
 		Broodwar << "The map is " << Broodwar->mapName() << ", a " << Broodwar->getStartLocations().size() << " player map" << std::endl;
@@ -45,8 +59,9 @@ int main(int argc, const char* argv[])
 		Broodwar->enableFlag(Flag::UserInput);
 		// Uncomment to enable complete map information
 		//Broodwar->enableFlag(Flag::CompleteMapInformation);
-
+		
 		ai = new AI();
+		ai->onGameStarted();
 
 		show_bullets = false;
 		show_visibility_data = false;
@@ -88,7 +103,8 @@ int main(int argc, const char* argv[])
 					}
 					else
 					{
-						Broodwar << "You typed \"" << e.getText() << "\"!" << std::endl;
+						//Broodwar << "You typed \"" << e.getText() << "\"!" << std::endl;
+						Broodwar->sendText(e.getText().c_str());
 					}
 					break;
 				case EventType::ReceiveText:
@@ -151,8 +167,10 @@ int main(int argc, const char* argv[])
 			if (show_visibility_data)
 				drawVisibilityData();
 
-			drawStats();
+			//drawStats();
 			Broodwar->drawTextScreen(300, 0, "FPS: %f", Broodwar->getAverageFPS());
+
+			ai->draw();
 
 			BWAPI::BWAPIClient.update();
 			if (!BWAPI::BWAPIClient.isConnected())
