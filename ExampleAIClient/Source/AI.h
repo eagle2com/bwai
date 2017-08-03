@@ -26,7 +26,7 @@ struct Worker {
 
 struct BuildJob {
 	Worker* w;
-	BWAPI::TilePosition target_position;
+	BWAPI::TilePosition target_position = { -1,1 };
 	BWAPI::UnitType type;
 	BWAPI::Unit target = nullptr;
 };
@@ -41,7 +41,7 @@ struct Base {
 
 	std::list<Worker*> min_workers;
 	std::list<Worker*> gas_workers;
-	std::list<MinPatch> min_patches;
+	std::list<MinPatch*> min_patches;
 	std::list<GasPatch> gas_patches;
 };
 
@@ -53,10 +53,17 @@ public:
 	void onGameStarted();
 	void onUnitCreated(BWAPI::Unit u);
 	void onUnitCompleted(BWAPI::Unit u);
+	void onUnitDestroyed(BWAPI::Unit u);
+	void onUnitShow(BWAPI::Unit u);
+	void onUnitHide(BWAPI::Unit u);
 	void tick();
 	void draw();
 
+
+	void assignWorkerToBase(Worker* w);
 	Worker* getClosestWorker(BWAPI::TilePosition p);
+	Worker* getLastWorker();
+
 	void freeWorker(Worker* w);
 	BWAPI::Player self();
 
@@ -76,5 +83,18 @@ public:
 	std::list<BuildJob> build_jobs;
 
 	std::list<BWAPI::Unit> incomplete_units;
+
+	std::list<BWAPI::Unit> barracks;
+	int future_barracks = 0;
+	std::list<BWAPI::Unit> marines;
+	std::map<int, BWAPI::Unit> targets;
+	BWAPI::Position current_attack_target;
+
+	// We need to fill a build grid when constructing otherwise
+	// two jobs could receive the same empty space as target positions
+	std::vector<int> build_grid;
+	int map_w, map_h;
+	void setGridUsed(BWAPI::UnitType type, BWAPI::TilePosition tile, int status);
+	bool isGridFree(BWAPI::UnitType type, BWAPI::TilePosition tile);
 };
 

@@ -53,7 +53,7 @@ int main(int argc, const char* argv[])
 		
 
 		std::cout << "starting match!" << std::endl;
-		Broodwar->sendText("power overwhelming");
+		//Broodwar->sendText("power overwhelming");
 		Broodwar << "The map is " << Broodwar->mapName() << ", a " << Broodwar->getStartLocations().size() << " player map" << std::endl;
 		// Enable some cheat flags
 		Broodwar->enableFlag(Flag::UserInput);
@@ -126,30 +126,16 @@ int main(int argc, const char* argv[])
 					ai->onUnitCreated(e.getUnit());
 					break;
 				case EventType::UnitDestroy:
-					if (!Broodwar->isReplay())
-						Broodwar->sendText("A %s [%p] has been destroyed at (%d,%d)", e.getUnit()->getType().c_str(), e.getUnit(), e.getUnit()->getPosition().x, e.getUnit()->getPosition().y);
+					ai->onUnitDestroyed(e.getUnit());
 					break;
 				case EventType::UnitMorph:
-					if (!Broodwar->isReplay())
-						Broodwar->sendText("A %s [%p] has been morphed at (%d,%d)", e.getUnit()->getType().c_str(), e.getUnit(), e.getUnit()->getPosition().x, e.getUnit()->getPosition().y);
-					else
-					{
-						// if we are in a replay, then we will print out the build order
-						// (just of the buildings, not the units).
-						if (e.getUnit()->getType().isBuilding() && e.getUnit()->getPlayer()->isNeutral() == false)
-						{
-							int seconds = Broodwar->getFrameCount() / 24;
-							int minutes = seconds / 60;
-							seconds %= 60;
-							Broodwar->sendText("%.2d:%.2d: %s morphs a %s", minutes, seconds, e.getUnit()->getPlayer()->getName().c_str(), e.getUnit()->getType().c_str());
-						}
-					}
+					
 					break;
 				case EventType::UnitShow:
-		
+					ai->onUnitShow(e.getUnit());
 					break;
 				case EventType::UnitHide:
-
+					ai->onUnitHide(e.getUnit());
 					break;
 				case EventType::UnitRenegade:
 					if (!Broodwar->isReplay())
